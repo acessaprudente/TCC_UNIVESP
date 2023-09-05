@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import HttpResponse, HttpRequest
 from django.core.paginator import Paginator
-from .models import Funcao, Setor
-from .forms import FuncaoForm, SetorForm
+from .models import Funcao, Setor, TipoRisco
+from .forms import FuncaoForm, SetorForm, TipoRiscoForm
 
 
 # Create your views here.
@@ -133,5 +133,49 @@ def setor_delete(request, id):
     setor.delete()
     messages.success(request, 'Registro Excluido com sucesso !')
     return redirect('lista_setores')
+    
+def lista_tiporiscos(request):
+    form = TipoRiscoForm
+    tiporiscos = TipoRisco.objects.all().order_by('nome')
+    data = {}
+    data['tiporiscos'] = tiporiscos
+    data['form'] = form
+    return render(request, 'core/lista_tiporiscos.html', data)
+
+def tiporisco_novo(request):
+    if request.method == "POST":
+        nome = request.POST.get('nome')
+        count = TipoRisco.objects.filter(nome=nome).count()
+        if count > 0:
+            messages.error(request, 'Registro já cadastrado com este Nome !')
+            return redirect('tiporisco_novo')
+        else:
+            form = TipoRiscoForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('lista_tiporiscos')
+    else:
+        form = TipoRiscoForm
+        return render(request, 'core/tiporisco_novo.html', {'form': form})
+
+def tiporisco_update(request, id):
+    tiporisco = TipoRisco.objects.get(id=id)
+    form = TipoRiscoForm(request.POST or None, instance=tiporisco)
+    data = {}
+    data['tiporisco'] = tiporisco
+    data['form'] = form
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            return redirect('lista_tiporiscos')
+    else:
+        form = TipoRiscoForm
+        return render(request, 'core/tiporisco_update.html', data)
+
+def tiporisco_delete(request, id):
+    tiporisco = TipoRisco.objects.get(id=id)
+    tiporisco.delete()
+    messages.success(request, 'Registro Excluido com sucesso !')
+    return redirect('lista_tiporiscos')    
 
   

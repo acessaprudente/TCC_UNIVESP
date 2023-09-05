@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from .views import home, lista_funcoes, funcao_novo, funcao_update, funcao_search, funcao_delete
 from .views import lista_setores, setor_novo, setor_update, setor_search, setor_delete
+from .views import lista_tiporiscos, tiporisco_novo, tiporisco_update, tiporisco_delete
 
 urlpatterns = [
     path('home', home, name='home'),
@@ -16,6 +17,11 @@ urlpatterns = [
     path('setor_update/<int:id>', setor_update, name='setor_update'),
     path('setor_delete/<int:id>', setor_delete, name='setor_delete'),
     path('setor_search', setor_search, name='setor_search'),
+    
+    path('lista_tiporiscos', lista_tiporiscos, name='lista_tiporiscos'),
+    path('tiporisco_novo', tiporisco_novo, name='tiporisco_novo'),
+    path('tiporisco_update/<int:id>', tiporisco_update, name='tiporisco_update'),
+    path('tiporisco_delete/<int:id>', tiporisco_delete, name='tiporisco_delete'),    
 ]   
 
 

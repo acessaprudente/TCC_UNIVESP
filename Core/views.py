@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import HttpResponse, HttpRequest
 from django.core.paginator import Paginator
-from .models import Funcao, Setor, TipoRisco
-from .forms import FuncaoForm, SetorForm, TipoRiscoForm
+from .models import Funcao, Setor, TipoRisco, Risco
+from .forms import FuncaoForm, SetorForm, TipoRiscoForm, RiscoForm
 
 
 # Create your views here.
@@ -133,7 +133,8 @@ def setor_delete(request, id):
     setor.delete()
     messages.success(request, 'Registro Excluido com sucesso !')
     return redirect('lista_setores')
-    
+
+
 def lista_tiporiscos(request):
     form = TipoRiscoForm
     tiporiscos = TipoRisco.objects.all().order_by('nome')
@@ -160,6 +161,13 @@ def tiporisco_novo(request):
 
 def tiporisco_update(request, id):
     tiporisco = TipoRisco.objects.get(id=id)
+
+    nome = request.POST.get('nome')
+    count = TipoRisco.objects.filter(nome=nome).exclude(id=id).count()
+    if count > 0:
+        messages.error(request, 'Registro já cadastrado com este Nome !')
+        return redirect('lista_tiporiscos')
+
     form = TipoRiscoForm(request.POST or None, instance=tiporisco)
     data = {}
     data['tiporisco'] = tiporisco
@@ -176,6 +184,64 @@ def tiporisco_delete(request, id):
     tiporisco = TipoRisco.objects.get(id=id)
     tiporisco.delete()
     messages.success(request, 'Registro Excluido com sucesso !')
-    return redirect('lista_tiporiscos')    
+    return redirect('lista_tiporiscos')
+
+def lista_riscos(request):
+    form = RiscoForm
+    riscos = Risco.objects.all().order_by('nome')
+    data = {}
+    data['riscos'] = riscos
+    data['form'] = form
+    return render(request, 'core/lista_riscos.html', data)
+
+def risco_novo(request):
+    if request.method == "POST":
+        nome = request.POST.get('id_nome')
+        tiporisco_id = request.POST.get('id_tiporisco')
+        count = Risco.objects.filter(nome=nome).count()
+        if count > 0:
+            messages.error(request, 'Registro já cadastrado com este Nome !')
+            return redirect('risco_novo')
+        else:
+            form = RiscoForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('lista_riscos')
+    else:
+        form = RiscoForm
+        tiporiscos = TipoRisco.objects.all().order_by('nome')
+        data = {}
+        data['tiporiscos'] = tiporiscos
+        data['form'] = form
+        return render(request, 'core/risco_novo.html', data)
+
+def risco_update(request, id):
+    risco = Risco.objects.get(id=id)
+    nome = request.POST.get('nome')
+    count = Risco.objects.filter(nome=nome).exclude(id=id).count()
+    if count > 0:
+        messages.error(request, 'Registro já cadastrado com este Nome !')
+        return redirect('lista_riscos')
+
+    form = RiscoForm(request.POST or None, instance=risco)
+    tiporiscos = TipoRisco.objects.all().order_by('nome')
+    data = {}
+    data['tiporiscos'] = tiporiscos
+    data['risco'] = risco
+    data['form'] = form
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            return redirect('lista_riscos')
+    else:
+        form = RiscoForm
+        return render(request, 'core/risco_update.html', data)
+
+def risco_delete(request, id):
+    risco = Risco.objects.get(id=id)
+    risco.delete()
+    messages.success(request, 'Registro Excluido com sucesso !')
+    return redirect('lista_riscos')
 
   

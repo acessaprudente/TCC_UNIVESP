@@ -3,6 +3,7 @@ from django.urls import path
 from .views import home, lista_funcoes, funcao_novo, funcao_update, funcao_search, funcao_delete
 from .views import lista_setores, setor_novo, setor_update, setor_search, setor_delete
 from .views import lista_tiporiscos, tiporisco_novo, tiporisco_update, tiporisco_delete
+from .views import lista_riscos, risco_novo, risco_update, risco_delete
 
 urlpatterns = [
     path('home', home, name='home'),
@@ -21,7 +22,12 @@ urlpatterns = [
     path('lista_tiporiscos', lista_tiporiscos, name='lista_tiporiscos'),
     path('tiporisco_novo', tiporisco_novo, name='tiporisco_novo'),
     path('tiporisco_update/<int:id>', tiporisco_update, name='tiporisco_update'),
-    path('tiporisco_delete/<int:id>', tiporisco_delete, name='tiporisco_delete'),    
+    path('tiporisco_delete/<int:id>', tiporisco_delete, name='tiporisco_delete'), 
+
+    path('lista_riscos', lista_riscos, name='lista_riscos'),
+    path('risco_novo', risco_novo, name='risco_novo'),
+    path('risco_update/<int:id>', risco_update, name='risco_update'),
+    path('risco_delete/<int:id>', risco_delete, name='risco_delete'),       
 ]   
 
 

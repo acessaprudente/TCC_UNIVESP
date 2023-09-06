@@ -1,5 +1,7 @@
 from django.forms import ModelForm
-from .models import Funcao, Exame, Risco, TipoRisco, Setor, Grupo
+from .models import Funcao, Exame, Risco, TipoRisco, Setor, Grupo, GrupoExame, GrupoFuncao, GrupoRisco
+
+
 
 class FuncaoForm(ModelForm):
     class Meta:
@@ -30,3 +32,25 @@ class GrupoForm(ModelForm):
     class Meta:
         model= Grupo
         fields = '__all__'
+
+class GrupoRiscoForm(ModelForm):
+    class Meta:
+        model= GrupoRisco
+        fields = '__all__'
+
+class GrupoExameForm(ModelForm):
+    class Meta:
+        model= GrupoExame
+        fields = '__all__'
+
+class GrupoFuncaoForm(ModelForm):
+    class Meta:
+        model= GrupoFuncao
+        fields = '__all__'
+
+
+
+
+
+
+

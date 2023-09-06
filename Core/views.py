@@ -2,9 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import HttpResponse, HttpRequest
 from django.core.paginator import Paginator
-from .models import Funcao, Setor, TipoRisco, Risco
-from .forms import FuncaoForm, SetorForm, TipoRiscoForm, RiscoForm
-
+from .models import Funcao, Setor, TipoRisco, Risco, Exame, Grupo
+from .forms import FuncaoForm, SetorForm, TipoRiscoForm, RiscoForm, ExameForm, GrupoForm
 
 # Create your views here.
 def home(request):
@@ -19,16 +18,10 @@ def lista_funcoes(request):
     data = {}
     data['funcoes'] = funcoes
     data['form'] = form
-    #return render(request, 'core/lista_funcoes.html', {'form':form,'funcoes': funcoes})
     return render(request, 'core/lista_funcoes.html', data)
+
 def funcao_novo(request):
     if request.method == "POST":
-        nome = request.POST.get('nome')
-        count = Funcao.objects.filter(nome = nome). count()
-        if count > 0:
-            messages.error(request,'Registro já cadastrado com esse nome!')
-        else:
-            return redirect('lista_funcoes')
         nome = request.POST.get('nome')
         count = Funcao.objects.filter(nome=nome).count()
         if count > 0:
@@ -43,8 +36,6 @@ def funcao_novo(request):
         form = FuncaoForm
         return render(request, 'core/funcao_novo.html', {'form': form})
 
-
-        
 def funcao_update(request, id):
     funcao = Funcao.objects.get(id=id)
     form = FuncaoForm(request.POST or None, instance=funcao)
@@ -58,11 +49,7 @@ def funcao_update(request, id):
     else:
         form = FuncaoForm
         return render(request, 'core/funcao_update.html', data)
-    
 
-
-
-        
 def funcao_search(request):
     search = request.GET.get('search')
     funcoes = Funcao.objects.filter(nome__icontains=search)
@@ -70,15 +57,14 @@ def funcao_search(request):
     data = {}
     data['funcoes'] = funcoes
     data['form'] = form
-    return render(request, 'core/lista_funcoes.html', data)       
+    return render(request, 'core/lista_funcoes.html', data)
 
 def funcao_delete(request, id):
     funcao = Funcao.objects.get(id=id)
     funcao.delete()
     messages.success(request, 'Registro Excluido com sucesso !')
     return redirect('lista_funcoes')
-    
-    
+
 def lista_setores(request):
     form = SetorForm
     setores_list = Setor.objects.all().order_by('nome')
@@ -89,6 +75,7 @@ def lista_setores(request):
     data['setores'] = setores
     data['form'] = form
     return render(request, 'core/lista_setores.html', data)
+
 def setor_novo(request):
     if request.method == "POST":
         nome = request.POST.get('nome')
@@ -133,7 +120,6 @@ def setor_delete(request, id):
     setor.delete()
     messages.success(request, 'Registro Excluido com sucesso !')
     return redirect('lista_setores')
-
 
 def lista_tiporiscos(request):
     form = TipoRiscoForm
@@ -244,4 +230,105 @@ def risco_delete(request, id):
     messages.success(request, 'Registro Excluido com sucesso !')
     return redirect('lista_riscos')
 
-  
+def lista_exames(request):
+    form = ExameForm
+    exames = Exame.objects.all().order_by('nome')
+    data = {}
+    data['exames'] = exames
+    data['form'] = form
+    return render(request, 'core/lista_exames.html', data)
+
+def exame_novo(request):
+    if request.method == "POST":
+        nome = request.POST.get('id_nome')
+        validade = request.POST.get('validade')
+        count = Exame.objects.filter(nome=nome).count()
+        if count > 0:
+            messages.error(request, 'Registro já cadastrado com este Nome !')
+            return redirect('exame_novo')
+        else:
+            form = ExameForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('lista_exames')
+    else:
+        form = ExameForm
+        data = {}
+        data['form'] = form
+        return render(request, 'core/exame_novo.html', data)
+
+def exame_update(request, id):
+    exame = Exame.objects.get(id=id)
+    form = ExameForm(request.POST or None, instance=exame)
+    data = {}
+    data['exame'] = exame
+    data['form'] = form
+
+    if request.method == "POST":
+        nome = request.POST.get('nome')
+        count = Exame.objects.filter(nome=nome).exclude(id=id).count()
+        if count > 0:
+            messages.error(request, 'Registro já cadastrado com este Nome !')
+            return redirect('lista_exames')        
+        if form.is_valid():
+            form.save()
+            return redirect('lista_exames')
+    else:
+        form = ExameForm
+        return render(request, 'core/exame_update.html', data)
+
+def exame_delete(request, id):
+    exame = Exame.objects.get(id=id)
+    exame.delete()
+    messages.success(request, 'Registro Excluido com sucesso !')
+    return redirect('lista_exames')
+
+def lista_grupos(request):
+    form = GrupoForm
+    grupos = Grupo.objects.all().order_by('nome')
+    data = {}
+    data['grupos'] = grupos
+    data['form'] = form
+    return render(request, 'core/lista_grupos.html', data)
+
+def grupo_novo(request):
+    if request.method == "POST":
+        nome = request.POST.get('nome')
+        count = Grupo.objects.filter(nome=nome).count()
+        if count > 0:
+            messages.error(request, 'Registro já cadastrado com este Nome !')
+            return redirect('grupo_novo')
+        else:
+            form = GrupoForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('lista_grupos')
+    else:
+        form = GrupoForm
+        return render(request, 'core/grupo_novo.html', {'form': form})
+
+def grupo_update(request, id):
+    grupo = Grupo.objects.get(id=id)
+    form = GrupoForm(request.POST or None, instance=grupo)
+    data = {}
+    data['grupo'] = grupo
+    data['form'] = form
+    if request.method == "POST":
+        nome = request.POST.get('nome')
+        count = Grupo.objects.filter(nome=nome).exclude(id=id).count()
+        if count > 0:
+            messages.error(request, 'Registro já cadastrado com este Nome !')
+            return redirect('lista_grupos')
+        
+        if form.is_valid():
+            form.save()
+            return redirect('lista_grupos')
+    else:
+        form = GrupoForm
+        return render(request, 'core/grupo_update.html', data)
+
+def grupo_delete(request, id):
+    grupo = Grupo.objects.get(id=id)
+    grupo.delete()
+    messages.success(request, 'Registro Excluido com sucesso !')
+    return redirect('lista_grupos')
